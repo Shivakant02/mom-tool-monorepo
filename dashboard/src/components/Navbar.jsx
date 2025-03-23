@@ -19,6 +19,9 @@ export default function Navbar() {
         <NavLink to="/project" className="btn btn-sm btn-outline">
           Project Info
         </NavLink>
+        <NavLink to="/mom" className="btn btn-sm btn-outline">
+          MOM
+        </NavLink>
       </div>
     </div>
   );

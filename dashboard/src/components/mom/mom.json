@@ -1,0 +1,44 @@
+{
+  "meetingId": "MOM-2025-001",
+  "date": "2025-03-21",
+  "time": "10:00 AM",
+  "location": "Zoom",
+  "organizer": "john.doe@example.com",
+  "attendees": [
+    "john.doe@example.com",
+    "jane.smith@example.com",
+    "mike.lee@example.com"
+  ],
+  "agenda": [
+    "Project Kick-off",
+    "Discuss project timeline and deliverables",
+    "Assign initial tasks"
+  ],
+  "discussionPoints": [
+    {
+      "topic": "Project Kick-off",
+      "details": "Introduced team members and discussed project goals."
+    },
+    {
+      "topic": "Timeline",
+      "details": "Reviewed proposed timeline. Agreed to complete Phase 1 by end of April."
+    },
+    {
+      "topic": "Task Assignment",
+      "details": "Assigned initial tasks to team members."
+    }
+  ],
+  "actionItems": [
+    {
+      "task": "Finalize project scope document",
+      "owner": "john.doe@example.com",
+      "dueDate": "2025-03-25"
+    },
+    {
+      "task": "Setup project repository",
+      "owner": "mike.lee@example.com",
+      "dueDate": "2025-03-22"
+    }
+  ],
+  "notes": "Next meeting scheduled for 2025-03-28 at 10:00 AM."
+}
