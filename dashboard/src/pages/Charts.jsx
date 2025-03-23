@@ -13,6 +13,8 @@ import NoAssigneeCard from "../components/cards/NoAssigneeCard";
 import StatusPieChart from "../components/charts/StatusPieChart";
 import AssigneeBarChart from "../components/charts/AssigneeBarChart";
 import DueTrendLineChart from "../components/charts/DueTrendLineChart";
+import OverdueTable from "../components/tables/OverdueTable";
+import NoAssigneeTable from "../components/tables/NoAssigneeTable";
 
 export default function Charts() {
   const [tasks, setTasks] = useState([]);
@@ -86,6 +88,12 @@ export default function Charts() {
         <AssigneeBarChart data={assigneeData} />
       </div>
       <DueTrendLineChart data={dueTrendData} />
+
+      {/* Bottom Section */}
+      <div className="flex flex-col md:flex-row gap-4 mt-8">
+        <OverdueTable tasks={tasks} />
+        <NoAssigneeTable tasks={tasks} />
+      </div>
     </div>
   );
 }
