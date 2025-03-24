@@ -1,0 +1,12 @@
+convertapi
+fastapi
+fuzzywuzzy
+openai
+protobuf
+pydantic
+pymongo
+python-dotenv
+pytz
+Requests
+uvicorn
+google-generativeai
