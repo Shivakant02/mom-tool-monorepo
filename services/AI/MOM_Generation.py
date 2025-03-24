@@ -1,20 +1,4 @@
-# from grok_client import GrokClient
-#
-# # Your cookie values
-# cookies = {
-#     "x-anonuserid": "87c0f23a-c3e6-43db-a3f4-1c544510ef0d",
-#     "x-challenge": "O9V8Z4dVzWim5HUG8rVArgzEh0pKKp4f3xNCGDG9Wvwef66qeMEZY7%2FRYcb9HXhO2l13Ky%2FrjpM%2BW%2B3ncGso2EEKaAD8hGWk%2FiXZhqscSIGlNrz73%2FvrWCGYocqm0h1pCiKUtwc2eIDGygQjqH8mi27xhDBgHtfapmoEGV55rT1XdqZQ1GY%3D",
-#     "x-signature": "ikYJe59iiC%2FX0ef1viaYIAE%2BM9Tl4dGYZm%2FXz9I6kehVt3ut%2BSFM6bKYX7NUMmQ7ZPbNMlCRvYswQ%2F%2FFzcQoeA%3D%3D",
-#     "sso": "eyJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uX2lkIjoiN2FmMGY3MmYtZjlhNC00YzMxLTliZTctYWI1ZjYzZWYxNjkzIn0.3llzkpqNctmYRzt-uEoPH42iEZplmkspnEViuovDPnY",
-#     "sso-rw": "eyJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uX2lkIjoiN2FmMGY3MmYtZjlhNC00YzMxLTliZTctYWI1ZjYzZWYxNjkzIn0.3llzkpqNctmYRzt-uEoPH42iEZplmkspnEViuovDPnY"
-# }
-#
-# # Initialize the client
-# client = GrokClient(cookies)
-#
-# # Send a message and get response
-# response = client.send_message("write a poem")
-# print(response)
+
 import os
 # import re
 # import json
