@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { getAccountIdByEmail, createJiraIssue } from "./jira-funtion-tasks.js";
+import { detectMissingFields } from "../detector/detector-service.js";
 
 const router = Router();
 
@@ -47,12 +48,10 @@ router.post("/create-tasks", async (req, res) => {
           },
           issuetype: { name: "Task" },
           assignee: { accountId },
-          // 🔥 Add due date here if provided
           ...(due_date && { duedate: due_date }),
         },
       };
 
-      // Create the Jira Issue with optional due date
       const response = await createJiraIssue(payload);
 
       if (response && response.key) {
@@ -60,20 +59,22 @@ router.post("/create-tasks", async (req, res) => {
           email: assignee_email,
           status: "success",
           task_id: response.key,
-          due_date: due_date || "not provided",
-        });
-      } else {
-        results.push({
-          email: assignee_email,
-          status: "failed",
-          reason: "Task creation failed",
+          due_date: due_date || "",
+          description: description || "",
+          summary: summary || "",
         });
       }
     }
 
-    return res
-      .status(201)
-      .json({ message: "Task processing completed", results });
+    // 🟢 Directly call detector logic here:
+    const detectorResults = await detectMissingFields(results);
+
+    return res.status(201).json({
+      success: true,
+      message: "Task processing + detection completed",
+      results,
+      detectorResults,
+    });
   } catch (err) {
     console.error("❌ Error creating tasks:", err.message);
     return res

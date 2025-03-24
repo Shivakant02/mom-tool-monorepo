@@ -13,19 +13,22 @@ export const sendDeadlineEmail = async ({
     .map((field) => `<li>${field}</li>`)
     .join("");
 
+  const taskLink = `https://lumiq-team-s5qytjpk.atlassian.net/jira/software/projects/CPG/list?selectedIssue=${taskId}`;
+
   const msg = {
-    to: to,
+    to,
     from: process.env.SENDGRID_FROM_EMAIL,
     subject: `🚨 Task ID ${taskId}: Missing Fields Alert`,
-    cc: cc.length > 0 ? cc : undefined, // Optional cc array
+    cc: cc.length > 0 ? cc : undefined,
     text: `Task ID: ${taskId} is missing the following fields: ${missingFields.join(
       ", "
-    )}. Please update them ASAP.`,
+    )}. Please update them ASAP.\nView Task: ${taskLink}`,
     html: `
       <h2>🚨 Missing Fields Alert for Task ID: ${taskId}</h2>
       <p><strong>Missing Fields:</strong></p>
       <ul>${missingFieldsFormatted}</ul>
       <p>Please update the missing fields as soon as possible in the system.</p>
+      <p>🔗 <a href="${taskLink}" target="_blank">Click here to view the Task in Jira</a></p>
       <br>
       <p>Regards,<br>Automation Bot</p>
     `,
