@@ -1,55 +1,50 @@
 import os
 import base64
 import requests
-import convertapi
 import threading
-from fastapi import FastAPI, HTTPException, BackgroundTasks
+from fastapi import APIRouter, HTTPException, BackgroundTasks
 from pydantic import BaseModel
 from typing import List
 from pymongo import MongoClient
 from datetime import datetime
 from dotenv import load_dotenv
+import convertapi
 
 load_dotenv()
 
-# Initialize FastAPI
-app = FastAPI()
-
-# MongoDB connection configuration (update as needed)
+# MongoDB Connection
 client = MongoClient(os.getenv("DB_URL"))
 db = client["meeting_db"]
-mom_collection = db["meeting_records"]
+meeting_records = db["meeting_records"]
 
-# Graph API configuration - ensure you have a valid access token.
+# Graph API Configuration
 GRAPH_ACCESS_TOKEN = os.getenv("GRAPH_ACCESS_TOKEN")
 GRAPH_SENDMAIL_ENDPOINT = "https://graph.microsoft.com/v1.0/me/microsoft.graph.sendMail"
 
-convertapi.api_credentials = os.getenv("Convert_API")
+# ConvertAPI Key for File Conversion
+convertapi.api_secret = os.getenv("Convert_API")
 
+# FastAPI Router
+mail_router = APIRouter()
 
-# Pydantic models
+# Pydantic Models
 class Attendee(BaseModel):
     name: str
     email: str
 
-
 class SendMOMRequest(BaseModel):
     meeting_id: str
-    attendees: List[Attendee]  # List with name and email
+    attendees: List[Attendee]
 
 
 def format_mom_content(mom_data: dict) -> str:
     """
-    Formats the mom_data object into a human-readable string.
+    Converts the MOM data into a well-structured human-readable format.
     """
-    lines = []
-    lines.append("MINUTES OF MEETING")
-    lines.append("=" * 50)
-    lines.append("")
+    lines = ["MINUTES OF MEETING", "=" * 50, ""]
 
     organizer = mom_data.get("organizer", "N/A")
-    lines.append(f"Organizer: {organizer}")
-    lines.append("")
+    lines.append(f"Organizer: {organizer}\n")
 
     lines.append("Discussion Topics:")
     for topic in mom_data.get("discussion_topics", []):
@@ -85,55 +80,44 @@ def format_mom_content(mom_data: dict) -> str:
 
 def generate_mom_files(meeting_id: str, content: str) -> dict:
     """
-    Generate MOM files in PDF, DOCX, and HTML formats using ConvertAPI.
-    The HTML file is created locally, and then converted to PDF and DOCX.
-    Returns a dictionary with keys 'pdf', 'docx', and 'html' containing the file paths.
+    Converts MOM content into PDF, DOCX, and HTML formats using ConvertAPI.
     """
     filenames = {}
 
-    # Create an HTML file from the formatted MOM content.
-    # Using <pre> to preserve spacing.
+    # Generate HTML File
     html_filename = f"mom_{meeting_id}.html"
     with open(html_filename, "w", encoding="utf-8") as f:
         f.write(f"<html><body><pre style='font-family: monospace;'>{content}</pre></body></html>")
     filenames["html"] = html_filename
 
-    # Convert HTML to PDF using ConvertAPI
+    # Convert HTML to PDF
     pdf_filename = f"mom_{meeting_id}.pdf"
     try:
         result_pdf = convertapi.convert('pdf', {'File': html_filename}, from_format='html')
-        if not result_pdf or not hasattr(result_pdf, 'file'):
-            raise Exception("ConvertAPI did not return a valid PDF conversion result.")
         result_pdf.file.save(pdf_filename)
         filenames["pdf"] = pdf_filename
     except Exception as e:
         print(f"Error converting HTML to PDF: {e}")
-        raise
 
-    # Convert HTML to DOCX using ConvertAPI
+    # Convert HTML to DOCX
     docx_filename = f"mom_{meeting_id}.docx"
     try:
         result_docx = convertapi.convert('docx', {'File': html_filename}, from_format='html')
-        if not result_docx or not hasattr(result_docx, 'file'):
-            raise Exception("ConvertAPI did not return a valid DOCX conversion result.")
         result_docx.file.save(docx_filename)
         filenames["docx"] = docx_filename
     except Exception as e:
         print(f"Error converting HTML to DOCX: {e}")
-        raise
 
     return filenames
 
 
 def send_email_with_attachments(attendees: List[Attendee], subject: str, body: str, files: dict):
     """
-    Sends an email with the provided subject and body along with file attachments using Microsoft Graph API.
+    Sends an email with MOM files as attachments using Microsoft Graph API.
     """
-    # Prepare recipients list for Graph API
     to_recipients = [{"emailAddress": {"address": att.email}} for att in attendees]
-
-    # Prepare attachments: read files and encode in base64
     attachments = []
+
     for filetype, filepath in files.items():
         try:
             with open(filepath, "rb") as f:
@@ -147,14 +131,10 @@ def send_email_with_attachments(attendees: List[Attendee], subject: str, body: s
         except Exception as e:
             print(f"Error reading file {filepath}: {e}")
 
-    # Build the email payload
     email_payload = {
         "message": {
             "subject": subject,
-            "body": {
-                "contentType": "Text",
-                "content": body
-            },
+            "body": {"contentType": "Text", "content": body},
             "toRecipients": to_recipients,
             "attachments": attachments
         },
@@ -169,51 +149,17 @@ def send_email_with_attachments(attendees: List[Attendee], subject: str, body: s
     response = requests.post(GRAPH_SENDMAIL_ENDPOINT, headers=headers, json=email_payload)
     if response.status_code not in (200, 202):
         raise Exception(f"Graph API sendMail failed: {response.status_code} - {response.text}")
-    print("Email sent successfully via Graph API.")
-
-
-def ensure_onedrive_folder(folder: str) -> str:
-    """
-    Ensures that the specified folder exists in OneDrive under the root.
-    If it doesn't exist, it creates the folder.
-    Returns the folder name.
-    """
-    url = f"https://graph.microsoft.com/v1.0/me/drive/root:/{folder}"
-    headers = {
-        "Authorization": f"Bearer {GRAPH_ACCESS_TOKEN}"
-    }
-    response = requests.get(url, headers=headers)
-    if response.status_code == 200:
-        print(f"Folder '{folder}' exists in OneDrive.")
-        return folder
-    else:
-        # Folder does not exist; create it.
-        create_url = "https://graph.microsoft.com/v1.0/me/drive/root/children"
-        headers["Content-Type"] = "application/json"
-        data = {
-            "name": folder,
-            "folder": {},
-            "@microsoft.graph.conflictBehavior": "rename"
-        }
-        response = requests.post(create_url, headers=headers, json=data)
-        if response.status_code in (200, 201):
-            print(f"Folder '{folder}' created in OneDrive.")
-            return folder
-        else:
-            raise Exception(f"Failed to create folder {folder} in OneDrive: {response.status_code} - {response.text}")
+    print("Email sent successfully.")
 
 
 def upload_file_to_onedrive(filepath: str, folder: str = "MOMFiles"):
     """
-    Uploads a file to OneDrive in the specified folder using Microsoft Graph API.
-    Ensures that the folder exists first.
+    Uploads MOM files to OneDrive via Microsoft Graph API.
     """
+    filename = os.path.basename(filepath)
+    upload_url = f"https://graph.microsoft.com/v1.0/me/drive/root:/{folder}/{filename}:/content"
+
     try:
-        # Ensure folder exists
-        ensure_onedrive_folder(folder)
-        filename = os.path.basename(filepath)
-        onedrive_path = f"/{folder}/{filename}"
-        upload_url = f"https://graph.microsoft.com/v1.0/me/drive/root:{onedrive_path}:/content"
         with open(filepath, "rb") as f:
             file_content = f.read()
         headers = {
@@ -222,16 +168,16 @@ def upload_file_to_onedrive(filepath: str, folder: str = "MOMFiles"):
         }
         response = requests.put(upload_url, headers=headers, data=file_content)
         if response.status_code in (200, 201):
-            print(f"Uploaded {filename} to OneDrive")
+            print(f"Uploaded {filename} to OneDrive.")
         else:
-            print(f"Failed to upload {filename} to OneDrive: {response.status_code} - {response.text}")
+            print(f"Failed to upload {filename}: {response.status_code} - {response.text}")
     except Exception as e:
-        print(f"Error uploading {filename} to OneDrive: {e}")
+        print(f"Error uploading {filename}: {e}")
 
 
 def upload_all_files_to_onedrive(files: dict):
     """
-    Uploads all files in the dictionary to OneDrive.
+    Uploads all MOM files to OneDrive.
     """
     for filepath in files.values():
         upload_file_to_onedrive(filepath)
@@ -239,64 +185,44 @@ def upload_all_files_to_onedrive(files: dict):
 
 def process_and_send_mom(meeting_id: str, attendees: List[Attendee]):
     """
-    Retrieves the MOM data from MongoDB using meeting_id, converts the mom_data object into a formatted string,
-    generates MOM files using ConvertAPI, and then concurrently sends an email with attachments and uploads
-    the files to OneDrive via Microsoft Graph API.
+    Retrieves MOM data from MongoDB, converts it into files, sends email, and uploads to OneDrive.
     """
     try:
-        mom_record = mom_collection.find_one({"meeting_id": meeting_id})
+        mom_record = meeting_records.find_one({"meeting_id": meeting_id})
         if not mom_record:
-            print("MOM record not found in MongoDB for meeting_id:", meeting_id)
+            print(f"MOM record not found for meeting_id: {meeting_id}")
             return
 
-        # Convert the mom_data object into a formatted, human-readable string.
         mom_data_obj = mom_record.get("mom_data", {})
         if not mom_data_obj:
-            print("MOM content is empty for meeting_id:", meeting_id)
+            print(f"MOM content is empty for meeting_id: {meeting_id}")
             return
 
         content = format_mom_content(mom_data_obj)
-
-        # Generate MOM files using ConvertAPI
         files = generate_mom_files(meeting_id, content)
 
-        # Define email subject and body
         subject = f"MOM for Meeting {meeting_id}"
-        email_body = f"Dear Attendee,\n\nPlease find attached the MOM for meeting {meeting_id}.\n\nRegards,\nMeeting Team"
+        email_body = f"Dear Attendee,\n\nPlease find attached the MOM for meeting {meeting_id}.\n\nBest,\nMeeting Team"
 
-        # Create threads for email sending and OneDrive upload concurrently.
-        email_thread = threading.Thread(target=send_email_with_attachments,
-                                        args=(attendees, subject, email_body, files))
+        email_thread = threading.Thread(target=send_email_with_attachments, args=(attendees, subject, email_body, files))
         upload_thread = threading.Thread(target=upload_all_files_to_onedrive, args=(files,))
 
         email_thread.start()
         upload_thread.start()
-
         email_thread.join()
         upload_thread.join()
 
-        # Cleanup generated files
         for filepath in files.values():
-            try:
-                os.remove(filepath)
-            except Exception as e:
-                print(f"Error removing file {filepath}: {e}")
+            os.remove(filepath)
 
     except Exception as e:
-        print(f"Error in process_and_send_mom for meeting_id {meeting_id}: {e}")
+        print(f"Error in process_and_send_mom: {e}")
 
 
-@app.post("/send_mom")
+@mail_router.post("/send_mom")
 def send_mom_endpoint(request: SendMOMRequest, background_tasks: BackgroundTasks):
     """
-    Endpoint to send MOM to all attendees via email using Microsoft Graph API and concurrently upload the MOM files to OneDrive.
-    Expects a meeting_id and an attendees list (each with name and email).
+    API Endpoint to process MOM and send it via email.
     """
     background_tasks.add_task(process_and_send_mom, request.meeting_id, request.attendees)
-    return {"message": "MOM processing, email sending, and OneDrive upload initiated via Graph API."}
-
-
-if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run(app, host="0.0.0.0", port=8003)
+    return {"message": "MOM processing and email sending started."}
