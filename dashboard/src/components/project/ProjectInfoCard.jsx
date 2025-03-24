@@ -23,7 +23,7 @@ export default function ProjectInfoCard({ project }) {
         Lead: <strong>{project.lead.displayName}</strong>
       </p>
       <a
-        href={`https://lumiq-team-s5qytjpk.atlassian.net/jira/software/projects/CPG${project.key}/boards/1`}
+        href={`https://lumiq-team-s5qytjpk.atlassian.net/jira/software/projects/${project.key}/boards/1`}
         target="_blank"
         rel="noopener noreferrer"
         className="btn btn-primary btn-sm mt-2"
