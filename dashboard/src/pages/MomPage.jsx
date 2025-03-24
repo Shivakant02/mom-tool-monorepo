@@ -3,11 +3,10 @@ import { useState } from "react";
 import MomEditor from "../components/mom/MomEditor";
 import MomActions from "../components/mom/MomActions";
 import jsonData from "../components/mom/mom.json";
+import { formatMomJson } from "./formatMomJson";
 
 export default function MomPage() {
-  const [momText, setMomText] = useState(
-    JSON.stringify(jsonData, null, 2) // Pretty print on load
-  );
+  const [momText, setMomText] = useState(formatMomJson(jsonData));
 
   return (
     <div className="p-6 space-y-4">
