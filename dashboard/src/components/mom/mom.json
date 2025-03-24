@@ -1,0 +1,100 @@
+{
+  "mom_data": {
+    "organizer": "Sarah Chen",
+    "discussion_topics": [
+      "Sprint planning for 2.5 release",
+      "Authentication system update",
+      "New dashboard feature progress",
+      "Testing strategy for the release",
+      "Documentation updates"
+    ],
+    "key_points": [
+      "Marcus resolved the caching issue with a 40% improvement in response time.",
+      "David is working on the OAuth 2.0 integration but needs three more days for the token refresh mechanism.",
+      "Team members agreed to split the work on the new dashboard feature.",
+      "Priya aims to increase unit test coverage to above 85% before the release.",
+      "Documentation updates are needed for the new features, with specific assignments."
+    ],
+    "faqs": [
+      "What is the status of the OAuth token refresh mechanism?",
+      "How are we dividing the work for the dashboard feature?",
+      "What is our testing strategy for the new features?",
+      "When are the documentation updates due?"
+    ],
+    "action_items": [
+      {
+        "item": "Review caching code changes",
+        "deadline": "Tomorrow afternoon",
+        "owner": "Priya Patel"
+      },
+      {
+        "item": "Complete OAuth token refresh mechanism",
+        "deadline": "Next Tuesday afternoon",
+        "owner": "K Pavan",
+        "email": "k.pavan@lumiq.ai"
+      },
+      {
+        "item": "Pair with David to resolve OAuth issues",
+        "deadline": "Today at 2 PM",
+        "owner": "Lokesh Kumawat",
+        "email": "lokesh.kumawat@lumiq.ai"
+      },
+      {
+        "item": "Improve user error messages",
+        "deadline": "End of next week",
+        "owner": "Shivakant",
+        "email": "shivakant1@lumiq.ai"
+      },
+      {
+        "item": "Complete metrics chart for dashboard",
+        "deadline": "Next Friday",
+        "owner": "David Kim"
+      },
+      {
+        "item": "Complete user activity timeline for dashboard",
+        "deadline": "Next Friday",
+        "owner": "Priya Patel"
+      },
+      {
+        "item": "Complete status overview widget for dashboard",
+        "deadline": "Next Friday",
+        "owner": "Sarah Chen"
+      },
+      {
+        "item": "Complete resource allocation chart and alerts panel for dashboard",
+        "deadline": "Next Friday",
+        "owner": "Marcus Johnson"
+      },
+      {
+        "item": "Set up end-to-end testing framework",
+        "deadline": "Next Thursday",
+        "owner": "David Kim"
+      },
+      {
+        "item": "Reach 85% test coverage",
+        "deadline": "End of the month",
+        "owner": "Priya Patel"
+      },
+      {
+        "item": "Complete dashboard integration tests",
+        "deadline": "End of the month",
+        "owner": "Marcus Johnson"
+      },
+      {
+        "item": "Update API documentation",
+        "deadline": "April 2nd",
+        "owner": "Priya Patel"
+      },
+      {
+        "item": "Handle developer documentation for authentication system",
+        "deadline": "End of the month",
+        "owner": "David Kim"
+      },
+      {
+        "item": "Write technical details for dashboard framework documentation",
+        "deadline": "End of the month",
+        "owner": "Marcus Johnson"
+      }
+    ]
+  }
+}
