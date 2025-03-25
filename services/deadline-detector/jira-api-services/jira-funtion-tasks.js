@@ -74,32 +74,32 @@ export const createJiraIssue = async (payload) => {
   }
 };
 
-// 3️⃣ Update Due Date (PUT)
-export const updateDueDate = async (issueKey, dueDate) => {
-  try {
-    const updateData = { fields: { duedate: dueDate } };
+// // 3️⃣ Update Due Date (PUT)
+// export const updateDueDate = async (issueKey, dueDate) => {
+//   try {
+//     const updateData = { fields: { duedate: dueDate } };
 
-    const response = await axios.put(
-      `${JIRA_BASE_URL}/rest/api/3/issue/${issueKey}`,
-      updateData,
-      {
-        headers: {
-          Authorization: getAuthHeader(),
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      }
-    );
+//     const response = await axios.put(
+//       `${JIRA_BASE_URL}/rest/api/3/issue/${issueKey}`,
+//       updateData,
+//       {
+//         headers: {
+//           Authorization: getAuthHeader(),
+//           Accept: "application/json",
+//           "Content-Type": "application/json",
+//         },
+//       }
+//     );
 
-    if (response.status === 204) {
-      console.log(`✅ Due Date Updated for ${issueKey}`);
-    } else {
-      throw new Error(`Failed to update due date for ${issueKey}`);
-    }
-  } catch (error) {
-    console.error(
-      `❌ Error updating due date for ${issueKey}:`,
-      error.response?.data || error.message
-    );
-  }
-};
+//     if (response.status === 204) {
+//       console.log(`✅ Due Date Updated for ${issueKey}`);
+//     } else {
+//       throw new Error(`Failed to update due date for ${issueKey}`);
+//     }
+//   } catch (error) {
+//     console.error(
+//       `❌ Error updating due date for ${issueKey}:`,
+//       error.response?.data || error.message
+//     );
+//   }
+// };
