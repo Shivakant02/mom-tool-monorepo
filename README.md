@@ -70,7 +70,7 @@ This project automates the entire process of generating Minutes of Meeting (MoM)
 5. Run this application on termial 2:
    Download the file :mom_aut.tar
    Run the command:
-   docker run -p 3005:3005 --env-file .env shivakant02/deadline-detector
+   docker run -p 3005:3005 --env-file .env shivakant02/deadline-detector:v1
    docker run -d -p 3005:3005 \
    -e SENDGRID_KEY="YOUR_SENDGRID_KEY" \
    -e SENDGRID_FROM_EMAIL="your_email@example.com" \
@@ -80,11 +80,11 @@ This project automates the entire process of generating Minutes of Meeting (MoM)
    -e JIRA_API_TOKEN="YOUR_JIRA_API_TOKEN" \
    -e JIRA_PROJECT_KEY="YOUR_PROJECT_KEY" \
    deadline-detector
-   docker run -p 8080:80 --env-file .env shivakant02/react-vite-frontend
+   docker run -p 8080:80 --env-file .env shivakant02/react-vite-frontend:v1
    docker run -p 8080:80 \
    -e VITE_JIRA_API_BASE_URL="http://dynamic-api.com" \
    -e VITE_MOM_API_BASE_URL="http://dynamic-mom.com" \
-   -e VITE_PROJECT_KEY="DYNAMIC_CPG" \
+   -e VITE_PROJECT_KEY="DYNAMIC_key" \
    react-vite-frontend
 
    ## using same network
@@ -99,8 +99,7 @@ docker run -d `
   -p 5173:5173 `
   -e VITE_JIRA_API_BASE_URL=http://backend-container:3005 `
   -e VITE_MOM_API_BASE_URL=mom-service-url `
-  -e VITE_PROJECT_KEY=CPG `
+  -e VITE_PROJECT_KEY=project-key `
   shivakant02/react-vite-frontend:v1
-
 
 ```
