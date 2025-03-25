@@ -65,8 +65,7 @@ This project automates the entire process of generating Minutes of Meeting (MoM)
 4. Run this application on termial 1:
    Download the file :mom_aut.tar
    Run the command:
-   docker load -i mom_auto.tar
-   docker run -d -p 8001:8001 mom_auto
+   docker run -d -p 8001:8001 shivakant02/mom_auto
 
 5. Run this application on termial 2:
    Download the file :mom_aut.tar
