@@ -1,0 +1,12 @@
+google-api-python-client
+google-generativeai
+convertapi
+fastapi
+openai
+pydantic
+pymongo
+pytz
+python-dotenv
+typing-extensions
+uvicorn
+watchdog
