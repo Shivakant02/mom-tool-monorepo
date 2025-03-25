@@ -98,7 +98,7 @@ docker run -d `
   --network mom-tool-network `
   -p 5173:5173 `
   -e VITE_JIRA_API_BASE_URL=http://backend-container:3005 `
-  -e VITE_MOM_API_BASE_URL=http://10.123.215.32:8001 `
+  -e VITE_MOM_API_BASE_URL=mom-service-url `
   -e VITE_PROJECT_KEY=CPG `
   shivakant02/react-vite-frontend:v1
 
