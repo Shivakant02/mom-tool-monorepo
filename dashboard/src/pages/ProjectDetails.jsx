@@ -4,12 +4,14 @@ import { fetchProjectDetails } from "../services/JiraApi";
 import ProjectInfoCard from "../components/project/ProjectInfoCard";
 import IssueTypesCard from "../components/project/IssueTypesCard";
 
+const projectkey = import.meta.env.VITE_PROJECT_KEY;
+
 export default function ProjectDetails() {
   const [project, setProject] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await fetchProjectDetails("CPG"); // replace "CPG" with dynamic id if needed
+      const data = await fetchProjectDetails(projectkey); // replace "CPG" with dynamic id if needed
       setProject(data);
     };
     fetchData();

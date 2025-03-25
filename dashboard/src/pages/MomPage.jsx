@@ -1,88 +1,279 @@
-// src/pages/MomPage.jsx
-import { useState } from "react";
+// import { useState, useEffect } from "react";
+// import axios from "axios";
+// import MomEditor from "../components/mom/MomEditor";
+// import MomActions from "../components/mom/MomActions";
+// import { formatMomJson, parseMomText } from "./formatMomJson";
+
+// const MOM_API = import.meta.env.VITE_MOM_API_BASE_URL;
+
+// export default function MomPage() {
+//   const [momText, setMomText] = useState("");
+//   const [jsonData, setJsonData] = useState(null); // Ensure it's null initially
+
+//   // Fetch MOM Data on Page Load
+//   useEffect(() => {
+//     const fetchMomData = async () => {
+//       try {
+//         const response = await axios.get(`${MOM_API}/process_meeting`);
+//         console.log("Fetched MOM Data:", response.data);
+
+//         setJsonData(response.data); // Set the entire data
+//         setMomText(formatMomJson(response.data.mom_data)); // Set editable text
+//       } catch (error) {
+//         console.error("Error fetching MOM:", error);
+//         alert("Failed to fetch MOM data.");
+//       }
+//     };
+
+//     fetchMomData();
+//   }, []); // Runs only on mount
+
+//   // Function to handle Save (Convert Text -> JSON -> API Call)
+//   const handleSave = async () => {
+//     if (!jsonData) {
+//       alert("No MOM data available to update.");
+//       return;
+//     }
+
+//     // Convert edited text back into JSON format
+//     const updatedMomData = parseMomText(momText);
+
+//     // Update only `mom_data` while preserving `meeting_id` & `attendees`
+//     const requestBody = {
+//       meeting_id: jsonData.meeting_id, // Extract `meeting_id`
+//       mom_data: updatedMomData, // Replace `mom_data`
+//     };
+
+//     console.log(requestBody);
+
+//     try {
+//       console.log("Updated MOM Payload:", requestBody);
+
+//       const response = await axios.put(`${MOM_API}/update_mom`, requestBody, {
+//         headers: { "Content-Type": "application/json" },
+//       });
+
+//       if (response.status === 200) {
+//         alert("MOM saved successfully!");
+//         setJsonData(requestBody); // Update local state with new data
+//       }
+//     } catch (error) {
+//       console.error("Error saving MOM:", error);
+//       alert("An error occurred while saving MOM.");
+//     }
+//   };
+
+//   return (
+//     <div className="p-6 space-y-4">
+//       <h1 className="text-2xl font-bold mb-4">Meeting Minutes (MOM)</h1>
+//       <button
+//         onClick={handleSave}
+//         className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+//       >
+//         Save MOM
+//       </button>
+//       <MomEditor momText={momText} setMomText={setMomText} />
+//       <MomActions momText={momText} />
+//     </div>
+//   );
+// }
+
+// import { useState, useEffect } from "react";
+// import axios from "axios";
+// import MomEditor from "../components/mom/MomEditor";
+// import MomActions from "../components/mom/MomActions";
+// import { formatMomJson, parseMomText } from "./formatMomJson";
+
+// const MOM_API = import.meta.env.VITE_MOM_API_BASE_URL;
+
+// export default function MomPage() {
+//   const [momText, setMomText] = useState("");
+//   const [jsonData, setJsonData] = useState(null); // Ensure it's null initially
+
+//   // Fetch MOM Data on Page Load
+//   useEffect(() => {
+//     const fetchMomData = async () => {
+//       try {
+//         const response = await axios.get(`${MOM_API}/process_meeting`);
+//         console.log("Fetched MOM Data:", response.data);
+
+//         setJsonData(response.data); // Set the entire data
+//         // Use the updated formatMomJson which checks for nested "mom_data"
+//         setMomText(formatMomJson(response.data.mom_data));
+//       } catch (error) {
+//         console.error("Error fetching MOM:", error);
+//         alert("Failed to fetch MOM data.");
+//       }
+//     };
+
+//     fetchMomData();
+//   }, []); // Runs only on mount
+
+//   // Function to handle Save (Convert Text -> JSON -> API Call)
+//   const handleSave = async () => {
+//     if (!jsonData) {
+//       alert("No MOM data available to update.");
+//       return;
+//     }
+
+//     // Convert edited text back into JSON format
+//     // const updatedMomData = parseMomText(momText);
+
+//     // // Update only `mom_data` while preserving `meeting_id` & (if needed) `attendees`
+//     // const requestBody = {
+//     //   meeting_id: jsonData.meeting_id, // Extract `meeting_id`
+//     //   mom_data: updatedMomData, // Replace `mom_data`
+//     // };
+
+//     // console.log("Updated MOM Payload:", requestBody);
+
+//     const requestBody = {
+//       meeting_id: jsonData.meeting_id,
+//       attendees: jsonData.attendees,
+//     };
+
+//     try {
+//       // const response = await axios.put(`${MOM_API}/update_mom`, requestBody, {
+//       //   headers: { "Content-Type": "application/json" },
+//       // });
+//       const response = await axios.post(`${MOM_API}/send_mom`, requestBody, {
+//         headers: { "Content-Type": "application/json" },
+//       });
+
+//       if (response.status === 200) {
+//         alert("MOM saved successfully!");
+//         setJsonData(requestBody);
+//         // Update local state with new data
+//       }
+//     } catch (error) {
+//       console.error("Error saving MOM:", error);
+//       alert("An error occurred while saving MOM.");
+//     }
+//   };
+
+//   return (
+//     <div className="p-6 space-y-4">
+//       <h1 className="text-2xl font-bold mb-4">Meeting Minutes (MOM)</h1>
+//       <button
+//         onClick={handleSave}
+//         className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+//       >
+//         Save MOM
+//       </button>
+//       <MomEditor momText={momText} setMomText={setMomText} />
+//       <MomActions momText={momText} />
+//     </div>
+//   );
+// }
+
+import { useState, useEffect } from "react";
+import axios from "axios";
 import MomEditor from "../components/mom/MomEditor";
 import MomActions from "../components/mom/MomActions";
-import jsonData from "../components/mom/mom.json";
 import { formatMomJson, parseMomText } from "./formatMomJson";
 
+const MOM_API = import.meta.env.VITE_MOM_API_BASE_URL;
+const JIRA_API = import.meta.env.VITE_JIRA_API_BASE_URL;
+
+/**
+ * Transforms action items to the desired format:
+ * { summary, description, assignee_email, due_date }
+ */
+function transformActionItems(actionItems = []) {
+  return actionItems.map((item) => ({
+    summary: item.item || "No Summary Provided",
+    description: item.description || "",
+    assignee_email: item.email || "",
+    due_date: item.deadline || "",
+  }));
+}
+
 export default function MomPage() {
-  const [momText, setMomText] = useState(formatMomJson(jsonData));
-  const textFile = `
-  Organizer: Sarah Chen
+  const [momText, setMomText] = useState("");
+  const [jsonData, setJsonData] = useState(null); // Entire data from API
 
-Discussion Topics:
-  1. Sprint planning for 2.5 release
-  2. Authentication system update
-  3. New dashboard feature progress
-  4. Testing strategy for the release
-  5. Documentation updates
+  // Fetch MOM Data on Page Load
+  useEffect(() => {
+    const fetchMomData = async () => {
+      try {
+        const response = await axios.get(`${MOM_API}/process_meeting`);
+        console.log("Fetched MOM Data:", response.data);
 
-Key Points:
-  - Marcus resolved the caching issue with a 40% improvement in response time.
-  - David is working on the OAuth 2.0 integration but needs three more days for the token refresh mechanism.
-  - Team members agreed to split the work on the new dashboard feature.
-  - Priya aims to increase unit test coverage to above 85% before the release.
-  - Documentation updates are needed for the new features, with specific assignments.
+        setJsonData(response.data); // Save the entire data
+        // Use the updated formatMomJson which checks for nested "mom_data"
+        setMomText(formatMomJson(response.data.mom_data));
+      } catch (error) {
+        console.error("Error fetching MOM:", error);
+        alert("Failed to fetch MOM data.");
+      }
+    };
 
-FAQs:
-  Q1: What is the status of the OAuth token refresh mechanism?
-  Q2: How are we dividing the work for the dashboard feature?
-  Q3: What is our testing strategy for the new features?
-  Q4: When are the documentation updates due?
+    fetchMomData();
+  }, []); // Runs only on mount
 
-Action Items:
-  1. Review caching code changes
-     Deadline: Tomorrow afternoon
-     Owner: Priya Patel
-  2. Complete OAuth token refresh mechanism
-     Deadline: Next Tuesday afternoon
-     Owner: K Pavan
-     Email: k.pavan@lumiq.ai
-  3. Pair with David to resolve OAuth issues
-     Deadline: Today at 2 PM
-     Owner: Lokesh Kumawat
-     Email: lokesh.kumawat@lumiq.ai
-  4. Improve user error messages
-     Deadline: End of next week
-     Owner: Shivakant
-     Email: shivakant1@lumiq.ai
-  5. Complete metrics chart for dashboard
-     Deadline: Next Friday
-     Owner: David Kim
-  6. Complete user activity timeline for dashboard
-     Deadline: Next Friday
-     Owner: Priya Patel
-  7. Complete status overview widget for dashboard
-     Deadline: Next Friday
-     Owner: Sarah Chen
-  8. Complete resource allocation chart and alerts panel for dashboard
-     Deadline: Next Friday
-     Owner: Marcus Johnson
-  9. Set up end-to-end testing framework
-     Deadline: Next Thursday
-     Owner: David Kim
-  10. Reach 85% test coverage
-     Deadline: End of the month
-     Owner: Priya Patel
-  11. Complete dashboard integration tests
-     Deadline: End of the month
-     Owner: Marcus Johnson
-  12. Update API documentation
-     Deadline: April 2nd
-     Owner: Priya Patel
-  13. Handle developer documentation for authentication system
-     Deadline: End of the month
-     Owner: David Kim
-  14. Write technical details for dashboard framework documentation
-     Deadline: End of the month
-     Owner: Marcus Johnson
-  `;
-  const res = parseMomText(textFile);
-  console.log(res);
+  // Function to handle Save (Convert Text -> JSON -> API Call)
+  const handleSave = async () => {
+    if (!jsonData) {
+      alert("No MOM data available to update.");
+      return;
+    }
+
+    // Convert edited text back into JSON format
+    const updatedMomData = parseMomText(momText);
+
+    // Build request body for updating MOM if needed (here we focus on sending email and creating tasks)
+    // Request body for sending MOM email: meeting_id and attendees
+    const sendMomRequestBody = {
+      meeting_id: jsonData.meeting_id,
+      attendees: jsonData.attendees,
+    };
+
+    // Request body for creating tasks: an array of action items
+    const createTasksRequestBody = transformActionItems(
+      updatedMomData.action_items
+    );
+
+    console.log("Send MOM Payload:", sendMomRequestBody);
+    console.log("Create Tasks Payload:", createTasksRequestBody);
+
+    try {
+      // Execute both API calls in parallel
+      const [sendResponse, createResponse] = await Promise.all([
+        axios.post(`${MOM_API}/send_mom`, sendMomRequestBody, {
+          headers: { "Content-Type": "application/json" },
+        }),
+        axios.post(`${JIRA_API}/api/v1/create-tasks`, createTasksRequestBody, {
+          headers: { "Content-Type": "application/json" },
+        }),
+      ]);
+
+      if (sendResponse.status === 200 && createResponse.status === 200) {
+        alert("MOM saved, email sent, and tasks created successfully!");
+        // Optionally update local state; here we update jsonData with meeting_id and attendees if needed.
+        setJsonData({
+          meeting_id: jsonData.meeting_id,
+          attendees: jsonData.attendees,
+          mom_data: updatedMomData,
+        });
+      }
+    } catch (error) {
+      console.error(
+        "Error in saving MOM, sending email, or creating tasks:",
+        error
+      );
+      alert("An error occurred while saving MOM.");
+    }
+  };
 
   return (
     <div className="p-6 space-y-4">
       <h1 className="text-2xl font-bold mb-4">Meeting Minutes (MOM)</h1>
+      <button
+        onClick={handleSave}
+        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+      >
+        Save MOM
+      </button>
       <MomEditor momText={momText} setMomText={setMomText} />
       <MomActions momText={momText} />
     </div>
