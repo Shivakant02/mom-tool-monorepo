@@ -80,10 +80,27 @@ This project automates the entire process of generating Minutes of Meeting (MoM)
    -e JIRA_API_TOKEN="YOUR_JIRA_API_TOKEN" \
    -e JIRA_PROJECT_KEY="YOUR_PROJECT_KEY" \
    deadline-detector
-
    docker run -p 8080:80 --env-file .env shivakant02/react-vite-frontend
    docker run -p 8080:80 \
    -e VITE_JIRA_API_BASE_URL="http://dynamic-api.com" \
    -e VITE_MOM_API_BASE_URL="http://dynamic-mom.com" \
    -e VITE_PROJECT_KEY="DYNAMIC_CPG" \
    react-vite-frontend
+
+   ## using same network
+```
+docker network create mom-tool-network
+
+docker run -d --name backend-container --network mom-tool-network-1 -p 3005:3005 --env-file .env shivakant02/deadline-detector:v1
+
+docker run -d `
+  --name frontend-container `
+  --network mom-tool-network `
+  -p 5173:5173 `
+  -e VITE_JIRA_API_BASE_URL=http://backend-container:3005 `
+  -e VITE_MOM_API_BASE_URL=http://10.123.215.32:8001 `
+  -e VITE_PROJECT_KEY=CPG `
+  shivakant02/react-vite-frontend:v1
+
+
+```
