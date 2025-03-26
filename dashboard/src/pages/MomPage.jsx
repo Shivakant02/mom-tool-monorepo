@@ -230,8 +230,9 @@ export default function MomPage() {
 
     // Request body for creating tasks: an array of action items
     const createTasksRequestBody = transformActionItems(
-      updatedMomData.action_items
+      updatedMomData.mom_data.action_items
     );
+    console.log(createTasksRequestBody);
 
     console.log("Send MOM Payload:", sendMomRequestBody);
     console.log("Create Tasks Payload:", createTasksRequestBody);

@@ -5,11 +5,11 @@ const router = express.Router();
 
 router.get("/project/:id", async (req, res) => {
   try {
-    const { JIRA_EMAIL, JIRA_API_TOKEN } = process.env;
+    const { JIRA_EMAIL, JIRA_API_TOKEN, JIRA_BASE_URL } = process.env;
     const { id } = req.params;
 
     const response = await axios.get(
-      `https://lumiq-team-s5qytjpk.atlassian.net/rest/api/3/project/${id}`,
+      `${JIRA_BASE_URL}/rest/api/3/project/${id}`,
       {
         headers: {
           Authorization: `Basic ${Buffer.from(

@@ -1,8 +1,7 @@
 import axios from "axios";
 
 // Config
-const JIRA_BASE_URL =
-  process.env.JIRA_BASE_URL || "https://lumiq-team-s5qytjpk.atlassian.net";
+const JIRA_BASE_URL = process.env.JIRA_BASE_URL;
 
 // Auth Header Generator
 const getAuthHeader = () => {
