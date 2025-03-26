@@ -25,6 +25,9 @@ export default function Navbar() {
         <NavLink to="/mom" className="btn btn-sm btn-outline">
           MOM
         </NavLink>
+        <NavLink to="/meetings" className="btn btn-sm btn-outline">
+          Meetings
+        </NavLink>
       </div>
     </div>
   );

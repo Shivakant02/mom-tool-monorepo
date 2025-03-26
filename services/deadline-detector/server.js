@@ -8,7 +8,9 @@ import projectRoute from "./jira-api-services/fetch-project-details.js";
 import CreatetaskRoute from "./jira-api-services/create-tasks.js";
 import updateRoute from "./jira-api-services/update-missing-fields.js";
 import emailAutomationRoute from "./email-automation/email-automation-route.js";
+import meetingRoute from "./n8n-config/meeting-routes.js";
 import cors from "cors";
+import connectToDatabase from "./config/dbConfig.js";
 
 const app = express();
 
@@ -28,6 +30,10 @@ app.use("/api/v1", projectRoute);
 app.use("/api/v1", CreatetaskRoute);
 app.use("/api/v1", updateRoute);
 app.use("/api/v1", emailAutomationRoute);
-app.listen(3005, () => {
-  console.log("Server is running on port 3005");
+app.use("/api/v1/meetings", meetingRoute);
+
+const PORT = process.env.PORT || 3005;
+app.listen(PORT, async () => {
+  await connectToDatabase();
+  console.log(`Server is running on:http://localhost:${PORT}`);
 });

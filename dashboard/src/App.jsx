@@ -7,6 +7,7 @@ import MomPage from "./pages/MomPage";
 import MissingFieldsPage from "./components/tables/NoAssigneeTable";
 import MissingTable from "./pages/MissingTable";
 import UpdateMissingFieldsPage from "./pages/UpdateMissingFieldsPage";
+import ScheduleMeeting from "./pages/ScheduleMeeting";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="/project" element={<ProjectDetails />} />
           <Route path="/mom" element={<MomPage />} />
           <Route path="/missing-field-table" element={<MissingTable />} />
+          <Route path="/meetings" element={<ScheduleMeeting />} />
           <Route
             path="/update-missing-fields/:issueKey"
             element={<UpdateMissingFieldsPage />}
