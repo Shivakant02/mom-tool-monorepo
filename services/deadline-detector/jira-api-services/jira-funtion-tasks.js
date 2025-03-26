@@ -73,32 +73,65 @@ export const createJiraIssue = async (payload) => {
   }
 };
 
-// // 3️⃣ Update Due Date (PUT)
-// export const updateDueDate = async (issueKey, dueDate) => {
-//   try {
-//     const updateData = { fields: { duedate: dueDate } };
+// 3️⃣ Update Missing Fields in Jira Issue
+export const updateJiraIssue = async (issueKey, fieldsToUpdate) => {
+  try {
+    if (!issueKey || Object.keys(fieldsToUpdate).length === 0) {
+      return { success: false, message: "No fields to update." };
+    }
 
-//     const response = await axios.put(
-//       `${JIRA_BASE_URL}/rest/api/3/issue/${issueKey}`,
-//       updateData,
-//       {
-//         headers: {
-//           Authorization: getAuthHeader(),
-//           Accept: "application/json",
-//           "Content-Type": "application/json",
-//         },
-//       }
-//     );
+    if (fieldsToUpdate.assignee) {
+      const accountId = await getAccountIdByEmail(fieldsToUpdate.assignee);
+      if (accountId) {
+        fieldsToUpdate.assignee = { accountId };
+      }
+    }
 
-//     if (response.status === 204) {
-//       console.log(`✅ Due Date Updated for ${issueKey}`);
-//     } else {
-//       throw new Error(`Failed to update due date for ${issueKey}`);
-//     }
-//   } catch (error) {
-//     console.error(
-//       `❌ Error updating due date for ${issueKey}:`,
-//       error.response?.data || error.message
-//     );
-//   }
-// };
+    if (fieldsToUpdate.description) {
+      fieldsToUpdate.description = {
+        type: "doc",
+        version: 1,
+        content: [
+          {
+            type: "paragraph",
+            content: [{ type: "text", text: fieldsToUpdate.description }],
+          },
+        ],
+      };
+    }
+
+    const response = await axios.put(
+      `${JIRA_BASE_URL}/rest/api/3/issue/${issueKey}`,
+      { fields: fieldsToUpdate },
+      {
+        headers: {
+          Authorization: getAuthHeader(),
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (response.status === 204) {
+      // Jira returns 204 No Content on a successful update
+      console.log(`✅ Jira Issue Updated: ${issueKey}`);
+      return {
+        success: true,
+        message: "Jira task updated successfully!",
+        updatedFields: fieldsToUpdate,
+      };
+    } else {
+      console.warn(`⚠️ Unexpected response status: ${response.status}`);
+      return {
+        success: false,
+        message: `Unexpected response status: ${response.status}`,
+      };
+    }
+  } catch (error) {
+    console.error(
+      "❌ Error updating Jira issue:",
+      error.response?.data || error.message
+    );
+    return { success: false, error: error.response?.data || error.message };
+  }
+};

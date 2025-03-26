@@ -4,6 +4,9 @@ import TaskList from "./pages/TaskList";
 import Charts from "./pages/Charts";
 import ProjectDetails from "./pages/ProjectDetails";
 import MomPage from "./pages/MomPage";
+import MissingFieldsPage from "./components/tables/NoAssigneeTable";
+import MissingTable from "./pages/MissingTable";
+import UpdateMissingFieldsPage from "./pages/UpdateMissingFieldsPage";
 
 function App() {
   return (
@@ -16,6 +19,11 @@ function App() {
           <Route path="/tasks-list" element={<TaskList />} />
           <Route path="/project" element={<ProjectDetails />} />
           <Route path="/mom" element={<MomPage />} />
+          <Route path="/missing-field-table" element={<MissingTable />} />
+          <Route
+            path="/update-missing-fields/:issueKey"
+            element={<UpdateMissingFieldsPage />}
+          />
         </Routes>
       </div>
     </>

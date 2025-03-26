@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom"; // Assuming React Router is used
 
-export default function NoAssigneeTable({ tasks }) {
-  const [missingFilter, setMissingFilter] = useState("Assignee");
+export default function MissingFieldsPage({ tasks }) {
+  const [missingFilter, setMissingFilter] = useState(""); // No default filter
+  const navigate = useNavigate();
 
   // Filter logic based on missing field
   const filteredTasks = tasks.filter((t) => {
@@ -14,63 +16,104 @@ export default function NoAssigneeTable({ tasks }) {
     } else if (missingFilter === "Due Date") {
       return !t.fields.duedate || t.fields.duedate.trim() === "";
     }
-    return false;
+    return true; // Show all if no filter is selected
   });
 
   return (
-    <div className="w-full md:w-1/2 p-2 space-y-3">
-      <div className="flex justify-between items-center">
-        <h2 className="text-lg font-semibold">Missing Field Tasks</h2>
-        <div className="dropdown">
-          <label tabIndex={0} className="btn btn-outline">
-            Filter: {missingFilter}
-          </label>
-          <ul
-            tabIndex={0}
-            className="dropdown-content z-[1] menu p-2 shadow bg-base-200 rounded-box w-52"
-          >
-            <li>
-              <a onClick={() => setMissingFilter("Assignee")}>
-                Missing Assignee
-              </a>
-            </li>
-            <li>
-              <a onClick={() => setMissingFilter("Summary")}>Missing Summary</a>
-            </li>
-            <li>
-              <a onClick={() => setMissingFilter("Due Date")}>
-                Missing Due Date
-              </a>
-            </li>
-          </ul>
-        </div>
+    <div className="w-full p-4 space-y-3">
+      <h2 className="text-lg font-semibold">Missing Field Tasks</h2>
+
+      {/* Dropdown for selecting missing fields */}
+      <div className="dropdown">
+        <label tabIndex={0} className="btn btn-outline">
+          {missingFilter ? `Filter: ${missingFilter}` : "Select Filter"}
+        </label>
+        <ul
+          tabIndex={0}
+          className="dropdown-content z-[1] menu p-2 shadow bg-base-200 rounded-box w-52"
+        >
+          <li>
+            <a
+              onClick={() => {
+                setMissingFilter("Assignee");
+                document.activeElement?.blur(); // Close dropdown
+              }}
+            >
+              Missing Assignee
+            </a>
+          </li>
+          <li>
+            <a
+              onClick={() => {
+                setMissingFilter("Summary");
+                document.activeElement?.blur(); // Close dropdown
+              }}
+            >
+              Missing Summary
+            </a>
+          </li>
+          <li>
+            <a
+              onClick={() => {
+                setMissingFilter("Due Date");
+                document.activeElement?.blur(); // Close dropdown
+              }}
+            >
+              Missing Due Date
+            </a>
+          </li>
+          <li>
+            <a
+              onClick={() => {
+                setMissingFilter("");
+                document.activeElement?.blur(); // Close dropdown
+              }}
+            >
+              Show All
+            </a>
+          </li>
+        </ul>
       </div>
 
+      {/* Table for displaying missing fields */}
       <div className="border border-base-300 rounded-md overflow-hidden">
         <table className="table table-fixed w-full">
           <thead className="bg-base-200 sticky top-0 z-10">
             <tr>
-              <th className="w-1/4">Task ID</th>
-              <th className="w-1/4">Summary</th>
-              <th className="w-1/4">Status</th>
-              <th className="w-1/4">Due Date</th>
+              <th className="w-1/5">Task ID</th>
+              <th className="w-1/5">Summary</th>
+              <th className="w-1/5">Status</th>
+              <th className="w-1/5">Due Date</th>
+              <th className="w-1/5">Assignee</th> {/* New column added */}
             </tr>
           </thead>
         </table>
-        <div className="max-h-45 overflow-y-auto">
+        <div className="max-h-80 overflow-y-auto">
           <table className="table table-fixed w-full">
             <tbody>
               {filteredTasks.map((task) => (
                 <tr key={task.id} className="hover">
-                  <td className="w-1/4">{task.key}</td>
-                  <td className="w-1/4">{task.fields.summary || "-"}</td>
-                  <td className="w-1/4">{task.fields.status.name}</td>
-                  <td className="w-1/4">{task.fields.duedate || "-"}</td>
+                  <td
+                    className="w-1/5 text-blue-500 cursor-pointer"
+                    onClick={() =>
+                      navigate(`/update-missing-fields/${task.key}`, {
+                        state: { task },
+                      })
+                    }
+                  >
+                    {task.key}
+                  </td>
+                  <td className="w-1/5">{task.fields.summary || "-"}</td>
+                  <td className="w-1/5">{task.fields.status.name}</td>
+                  <td className="w-1/5">{task.fields.duedate || "-"}</td>
+                  <td className="w-1/5">
+                    {task.fields.assignee?.displayName || "Unassigned"}
+                  </td>
                 </tr>
               ))}
               {filteredTasks.length === 0 && (
                 <tr>
-                  <td colSpan="4" className="text-center">
+                  <td colSpan="5" className="text-center">
                     No tasks with missing {missingFilter.toLowerCase()} ✅
                   </td>
                 </tr>

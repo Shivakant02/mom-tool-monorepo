@@ -13,7 +13,7 @@ export const sendDeadlineEmail = async ({
     .map((field) => `<li>${field}</li>`)
     .join("");
 
-  const taskLink = `https://lumiq-team-s5qytjpk.atlassian.net/jira/software/projects/CPG/list?selectedIssue=${taskId}`;
+  const taskLink = `${process.env.JIRA_BASE_URL}/jira/software/projects/${process.env.JIRA_PROJECT_KEY}/list?selectedIssue=${taskId}`;
 
   const msg = {
     to,

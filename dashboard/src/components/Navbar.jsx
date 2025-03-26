@@ -16,6 +16,9 @@ export default function Navbar() {
         <NavLink to="/tasks-list" className="btn btn-sm btn-outline">
           Task List
         </NavLink>
+        <NavLink to="/missing-field-table" className="btn btn-sm btn-outline">
+          Missing Fields
+        </NavLink>
         <NavLink to="/project" className="btn btn-sm btn-outline">
           Project Info
         </NavLink>

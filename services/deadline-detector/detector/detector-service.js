@@ -100,7 +100,7 @@ export const detectMissingFields = async (tasks) => {
       });
 
       await sendDeadlineEmail({
-        to: "shivakant1@lumiq.ai",
+        to: process.env.ORGANIZER_EMAIL,
         taskId: task.task_id,
         missingFields,
       });

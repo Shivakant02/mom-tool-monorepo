@@ -6,6 +6,8 @@ import emailRoute from "./email service/send-email-route.js";
 import taskRoute from "./jira-api-services/jira-api-service.js";
 import projectRoute from "./jira-api-services/fetch-project-details.js";
 import CreatetaskRoute from "./jira-api-services/create-tasks.js";
+import updateRoute from "./jira-api-services/update-missing-fields.js";
+import emailAutomationRoute from "./email-automation/email-automation-route.js";
 import cors from "cors";
 
 const app = express();
@@ -24,6 +26,8 @@ app.use("/api/v1", emailRoute);
 app.use("/api/v1", taskRoute);
 app.use("/api/v1", projectRoute);
 app.use("/api/v1", CreatetaskRoute);
+app.use("/api/v1", updateRoute);
+app.use("/api/v1", emailAutomationRoute);
 app.listen(3005, () => {
   console.log("Server is running on port 3005");
 });
