@@ -1,7 +1,10 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { scheduleMeeting } from "../services/scheduleMeeting";
 
 export default function ScheduleMeetingForm() {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     subject: "",
     start: { dateTime: "", timeZone: "Asia/Kolkata" },
@@ -11,7 +14,7 @@ export default function ScheduleMeetingForm() {
     onlineMeetingProvider: "teamsForBusiness",
   });
 
-  const [attendeeInput, setAttendeeInput] = useState({ address: "", name: "" });
+  const [attendeeEmail, setAttendeeEmail] = useState("");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -23,12 +26,8 @@ export default function ScheduleMeetingForm() {
   };
 
   const addAttendee = () => {
-    if (attendeeInput.address && attendeeInput.name) {
-      if (
-        formData.attendees.some(
-          (a) => a.emailAddress.address === attendeeInput.address
-        )
-      ) {
+    if (attendeeEmail) {
+      if (formData.attendees.some((a) => a.emailAddress === attendeeEmail)) {
         alert("Attendee already added!");
         return;
       }
@@ -37,11 +36,11 @@ export default function ScheduleMeetingForm() {
         ...formData,
         attendees: [
           ...formData.attendees,
-          { emailAddress: { ...attendeeInput }, type: "required" },
+          { emailAddress: attendeeEmail, type: "required" },
         ],
       });
 
-      setAttendeeInput({ address: "", name: "" });
+      setAttendeeEmail("");
     }
   };
 
@@ -58,7 +57,6 @@ export default function ScheduleMeetingForm() {
       await scheduleMeeting(formData);
       alert("Meeting Scheduled Successfully!");
 
-      // Clear the form after successful submission
       setFormData({
         subject: "",
         start: { dateTime: "", timeZone: "Asia/Kolkata" },
@@ -78,18 +76,7 @@ export default function ScheduleMeetingForm() {
         📅 Schedule a Meeting
       </h2>
 
-      {/* Action Buttons */}
-      <div className="flex justify-between mb-6">
-        <button className="btn btn-outline w-1/2 mr-2">
-          📅 View Upcoming Events
-        </button>
-        <button className="btn btn-outline w-1/2 ml-2">
-          🕒 View Past Events
-        </button>
-      </div>
-
       <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-        {/* Meeting Subject */}
         <input
           type="text"
           name="subject"
@@ -100,7 +87,6 @@ export default function ScheduleMeetingForm() {
           required
         />
 
-        {/* Start & End Time */}
         <div className="grid grid-cols-2 gap-6">
           <div>
             <label className="block text-gray-600 text-sm mb-1">
@@ -126,7 +112,6 @@ export default function ScheduleMeetingForm() {
           </div>
         </div>
 
-        {/* Attendee Input */}
         <div>
           <label className="block text-gray-600 text-sm mb-1">
             Add Attendees
@@ -134,20 +119,9 @@ export default function ScheduleMeetingForm() {
           <div className="flex items-center gap-4">
             <input
               type="email"
-              value={attendeeInput.address}
-              onChange={(e) =>
-                setAttendeeInput({ ...attendeeInput, address: e.target.value })
-              }
+              value={attendeeEmail}
+              onChange={(e) => setAttendeeEmail(e.target.value)}
               placeholder="Attendee Email"
-              className="input input-bordered flex-grow"
-            />
-            <input
-              type="text"
-              value={attendeeInput.name}
-              onChange={(e) =>
-                setAttendeeInput({ ...attendeeInput, name: e.target.value })
-              }
-              placeholder="Attendee Name"
               className="input input-bordered flex-grow"
             />
             <button
@@ -160,7 +134,6 @@ export default function ScheduleMeetingForm() {
           </div>
         </div>
 
-        {/* Display Attendees */}
         {formData.attendees.length > 0 && (
           <div className="mt-4 space-y-2">
             {formData.attendees.map((attendee, index) => (
@@ -168,9 +141,7 @@ export default function ScheduleMeetingForm() {
                 key={index}
                 className="flex items-center justify-between p-2 bg-gray-100 rounded-md"
               >
-                <span className="text-gray-800">
-                  {attendee.emailAddress.name} ({attendee.emailAddress.address})
-                </span>
+                <span className="text-gray-800">{attendee.emailAddress}</span>
                 <button
                   type="button"
                   onClick={() => removeAttendee(index)}
@@ -183,10 +154,25 @@ export default function ScheduleMeetingForm() {
           </div>
         )}
 
-        {/* Submit Button */}
         <button type="submit" className="btn btn-primary w-full py-3 text-lg">
           ✅ Schedule Meeting
         </button>
+
+        {/* Buttons for past and upcoming events */}
+        <div className="flex justify-between mt-4">
+          <button
+            onClick={() => navigate("/upcoming-events")}
+            className="btn bg-white border border-gray-400 text-gray-800 w-1/2 mr-2 hover:bg-gray-100"
+          >
+            📅 View Upcoming Events
+          </button>
+          <button
+            onClick={() => navigate("/past-events")}
+            className="btn bg-white border border-gray-400 text-gray-800 w-1/2 ml-2 hover:bg-gray-100"
+          >
+            📜 View Past Events
+          </button>
+        </div>
       </form>
     </div>
   );

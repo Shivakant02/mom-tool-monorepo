@@ -9,6 +9,8 @@ import CreatetaskRoute from "./jira-api-services/create-tasks.js";
 import updateRoute from "./jira-api-services/update-missing-fields.js";
 import emailAutomationRoute from "./email-automation/email-automation-route.js";
 import meetingRoute from "./n8n-config/meeting-routes.js";
+import momRoutes from "./mom-data/mom-routes.js";
+import geminiRoutes from "./gemini/gemini-routes.js";
 import cors from "cors";
 import connectToDatabase from "./config/dbConfig.js";
 
@@ -31,6 +33,8 @@ app.use("/api/v1", CreatetaskRoute);
 app.use("/api/v1", updateRoute);
 app.use("/api/v1", emailAutomationRoute);
 app.use("/api/v1/meetings", meetingRoute);
+app.use("/api/v1", momRoutes);
+app.use("/api/v1/gemini", geminiRoutes);
 
 const PORT = process.env.PORT || 3005;
 app.listen(PORT, async () => {
