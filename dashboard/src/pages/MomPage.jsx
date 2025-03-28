@@ -29,7 +29,7 @@ export default function MomPage() {
   const [momText, setMomText] = useState("");
   const [meetings, setMeetings] = useState([]);
   const [selectedMeeting, setSelectedMeeting] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
+  // const [searchTerm, setSearchTerm] = useState("");
   const [aiSummary, setAiSummary] = useState(""); // AI summary state
   const [loadingSummary, setLoadingSummary] = useState(false); // Loading state for AI summary
   const [showModal, setShowModal] = useState(false);
@@ -141,7 +141,7 @@ export default function MomPage() {
         {/* Left: Search & Meeting Filter */}
         <div className="flex gap-2 items-center">
           {/* Search Bar */}
-          <div className="relative w-72">
+          {/* <div className="relative w-72">
             <Search className="absolute left-3 top-3 text-gray-500 w-5 h-5" />
             <input
               type="text"
@@ -150,7 +150,7 @@ export default function MomPage() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10 pr-4 py-2 w-full border rounded-lg text-sm focus:ring focus:ring-blue-300"
             />
-          </div>
+          </div> */}
 
           {/* Meeting Dropdown */}
           <div className="relative w-80">
@@ -159,15 +159,11 @@ export default function MomPage() {
               onChange={(e) => handleMeetingSelect(e.target.value)}
             >
               <option value="">Select a Meeting</option>
-              {meetings
-                .filter((m) =>
-                  m.subject.toLowerCase().includes(searchTerm.toLowerCase())
-                )
-                .map((meeting) => (
-                  <option key={meeting.meeting_id} value={meeting.meeting_id}>
-                    {meeting.subject}
-                  </option>
-                ))}
+              {meetings.map((meeting) => (
+                <option key={meeting.meeting_id} value={meeting.meeting_id}>
+                  {meeting.subject}
+                </option>
+              ))}
             </select>
             <ChevronDown className="absolute right-3 top-3 text-gray-500 w-5 h-5 pointer-events-none" />
           </div>
@@ -301,8 +297,8 @@ export default function MomPage() {
       <FollowUpMeetingModal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
-        mom_data={selectedMeeting.mom_data} // MOM data for API
-        attendees={selectedMeeting.attendees} // Attendees for follow-up meeting
+        mom_data={selectedMeeting?.mom_data || {}} // Ensure it doesn't break
+        attendees={selectedMeeting?.attendees || []} // Ensure it doesn't break
         onCreateMeeting={async (meetingData) => {
           const response = await scheduleMeeting(meetingData);
           if (response) {

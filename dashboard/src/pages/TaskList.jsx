@@ -11,7 +11,9 @@ export default function TaskList() {
     assignee: "",
     startDate: "",
     endDate: "",
+    tasks: [],
   });
+
   const [currentPage, setCurrentPage] = useState(1);
   const tasksPerPage = 5;
 
@@ -31,9 +33,14 @@ export default function TaskList() {
 
   // ✅ Updated multi-filter logic using only `filter`
   const filteredTasks = tasks.filter((t) => {
+    // Check if a meeting is selected and if the task is in its tasks array
+    const meetingFilterMatch =
+      !filter.tasks.length || filter.tasks.includes(t.key);
+
     const statusMatch = filter.status
       ? t.fields.status.name === filter.status
       : true;
+
     const assigneeMatch = filter.assignee
       ? (t.fields.assignee?.displayName || "Unassigned") === filter.assignee
       : true;
@@ -52,7 +59,7 @@ export default function TaskList() {
         (!endDate || taskDate <= endDate)
       : true;
 
-    return statusMatch && assigneeMatch && dateMatch;
+    return meetingFilterMatch && statusMatch && assigneeMatch && dateMatch;
   });
 
   const totalPages = Math.ceil(filteredTasks.length / tasksPerPage);

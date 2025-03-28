@@ -10,7 +10,9 @@ export default function FollowUpMeetingModal({
   baseUrl,
 }) {
   const [meetingSubject, setMeetingSubject] = useState("Follow-up Meeting");
-  const [meetingAgenda, setMeetingAgenda] = useState("");
+  const [rawMeetingAgenda, setRawMeetingAgenda] = useState(""); // Store raw HTML
+  const [meetingAgenda, setMeetingAgenda] = useState(""); // Store plain text
+
   const [meetingDate, setMeetingDate] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
@@ -20,35 +22,39 @@ export default function FollowUpMeetingModal({
     if (isOpen) {
       axios
         .post(`${baseUrl}/api/v1/gemini/generate-agenda`, { mom_data })
-        .then((response) => setMeetingAgenda(response.data.agenda.html_agenda))
-        .catch(() => setMeetingAgenda("No agenda available"));
+        .then((response) => {
+          const htmlAgenda = response.data.agenda.html_agenda;
+          setRawMeetingAgenda(htmlAgenda); // Store raw HTML
+
+          // Convert HTML to plain text
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(htmlAgenda, "text/html");
+          setMeetingAgenda(doc.body.textContent || "No agenda available");
+        })
+        .catch(() => {
+          setRawMeetingAgenda("No agenda available");
+          setMeetingAgenda("No agenda available");
+        });
     }
   }, [isOpen, mom_data, baseUrl]);
-
-  // Auto-set end time (30 mins after start time)
-  const handleStartTimeChange = (e) => {
-    const start = e.target.value;
-    setStartTime(start);
-
-    if (start) {
-      const [hours, minutes] = start.split(":").map(Number);
-      const endHours = hours + Math.floor((minutes + 30) / 60);
-      const endMinutes = (minutes + 30) % 60;
-      setEndTime(
-        `${String(endHours).padStart(2, "0")}:${String(endMinutes).padStart(
-          2,
-          "0"
-        )}`
-      );
-    }
-  };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-96 space-y-4">
-        <h2 className="text-xl font-semibold">Schedule Follow-up Meeting</h2>
+    <div className="fixed inset-0 flex items-center justify-center z-50">
+      <div className="bg-white bg-opacity-90 backdrop-blur-md border border-gray-300 rounded-xl shadow-2xl w-[600px] max-w-xl p-6 space-y-4 relative">
+        {/* Close Button */}
+        <button
+          className="absolute top-3 right-3 text-gray-600 hover:text-gray-900"
+          onClick={onClose}
+        >
+          ✕
+        </button>
+
+        {/* Title */}
+        <h2 className="text-xl font-semibold text-center">
+          Schedule Follow-up Meeting
+        </h2>
 
         {/* Meeting Subject */}
         <div>
@@ -57,7 +63,7 @@ export default function FollowUpMeetingModal({
             type="text"
             value={meetingSubject}
             onChange={(e) => setMeetingSubject(e.target.value)}
-            className="w-full border rounded-lg p-2"
+            className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
@@ -68,7 +74,7 @@ export default function FollowUpMeetingModal({
             type="date"
             value={meetingDate}
             onChange={(e) => setMeetingDate(e.target.value)}
-            className="w-full border rounded-lg p-2"
+            className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
@@ -78,47 +84,47 @@ export default function FollowUpMeetingModal({
           <input
             type="time"
             value={startTime}
-            onChange={handleStartTimeChange}
-            className="w-full border rounded-lg p-2"
+            onChange={(e) => setStartTime(e.target.value)}
+            className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
-        {/* End Time Input (Auto-set) */}
+        {/* End Time Input (User Decides) */}
         <div>
           <label className="block text-sm font-medium">End Time</label>
           <input
             type="time"
             value={endTime}
-            readOnly
-            className="w-full border rounded-lg p-2 bg-gray-100"
+            onChange={(e) => setEndTime(e.target.value)}
+            className="w-full border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
         {/* Attendees List */}
         <div>
           <label className="block text-sm font-medium">Attendees</label>
-          <ul className="list-disc list-inside text-gray-700">
+          <ul className="list-disc list-inside text-gray-700 pl-4">
             {attendees.map((attendee, index) => (
               <li key={index}>{attendee}</li>
             ))}
           </ul>
         </div>
 
-        {/* Agenda (Prefilled from API) */}
+        {/* Agenda (Displayed as Plain Text) */}
         <div>
           <label className="block text-sm font-medium">Agenda</label>
           <textarea
             value={meetingAgenda}
             readOnly
-            className="w-full border rounded-lg p-2 h-20 bg-gray-100"
+            className="w-full border border-gray-300 rounded-lg p-2 h-24 bg-gray-100"
           />
         </div>
 
         {/* Action Buttons */}
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-between mt-4">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-gray-400 text-white rounded-lg"
+            className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
           >
             Cancel
           </button>
@@ -141,11 +147,11 @@ export default function FollowUpMeetingModal({
                 onlineMeetingProvider: "teamsForBusiness",
                 body: {
                   contentType: "HTML",
-                  content: `${meetingAgenda}`,
+                  content: rawMeetingAgenda, // Keeping raw HTML
                 },
               })
             }
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
           >
             Create Meeting
           </button>

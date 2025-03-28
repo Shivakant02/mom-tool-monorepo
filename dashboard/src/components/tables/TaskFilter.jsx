@@ -1,12 +1,44 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 export default function TaskFilter({ filter, setFilter, assignees }) {
   const [statusSearch, setStatusSearch] = useState("");
   const [assigneeSearch, setAssigneeSearch] = useState("");
+  const [subjectSearch, setSubjectSearch] = useState("");
   const [openStatus, setOpenStatus] = useState(false);
   const [openAssignee, setOpenAssignee] = useState(false);
+  const [openSubject, setOpenSubject] = useState(false);
+  const [meetings, setMeetings] = useState([]);
 
   const statusOptions = ["To Do", "In Progress", "Done"];
+
+  // Fetch meetings when the component mounts
+  useEffect(() => {
+    const fetchMeetings = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:3005/api/v1/get-all-tasks"
+        );
+        if (response.data.success) {
+          setMeetings(response.data.data);
+        }
+      } catch (error) {
+        console.error("Error fetching meetings:", error);
+      }
+    };
+
+    fetchMeetings();
+  }, []);
+
+  const handleSubjectChange = (meeting) => {
+    setFilter((prev) => ({
+      ...prev,
+      subject: meeting.subject,
+      tasks: meeting.tasks,
+    }));
+    setOpenSubject(false);
+    setSubjectSearch("");
+  };
 
   const handleStatusChange = (value) => {
     setFilter((prev) => ({ ...prev, status: value }));
@@ -25,15 +57,66 @@ export default function TaskFilter({ filter, setFilter, assignees }) {
   };
 
   const handleClearFilters = () => {
-    setFilter({ status: "", assignee: "", startDate: "", endDate: "" });
+    setFilter({
+      subject: "",
+      tasks: [],
+      status: "",
+      assignee: "",
+      startDate: "",
+      endDate: "",
+    });
     setStatusSearch("");
     setAssigneeSearch("");
+    setSubjectSearch("");
     setOpenStatus(false);
     setOpenAssignee(false);
+    setOpenSubject(false);
   };
 
   return (
     <div className="flex flex-wrap gap-4 mb-6 items-end">
+      {/* Subject Dropdown */}
+      <div className="relative">
+        <button
+          type="button"
+          className="btn btn-outline w-64 justify-between"
+          onClick={() => {
+            setOpenSubject(!openSubject);
+            setOpenStatus(false);
+            setOpenAssignee(false);
+          }}
+        >
+          {filter.subject || "Select Meeting Subject"}
+        </button>
+        {openSubject && (
+          <div className="absolute mt-1 bg-base-200 p-4 rounded-box w-72 space-y-2 z-20">
+            <input
+              type="text"
+              placeholder="Search subject..."
+              value={subjectSearch}
+              onChange={(e) => setSubjectSearch(e.target.value)}
+              className="input input-bordered w-full"
+            />
+            <ul className="menu p-0 space-y-1 max-h-48 overflow-y-auto">
+              <li>
+                <a onClick={() => handleClearFilters()}>All Subjects</a>
+              </li>
+              {meetings
+                .filter((m) =>
+                  m.subject.toLowerCase().includes(subjectSearch.toLowerCase())
+                )
+                .map((meeting) => (
+                  <li key={meeting._id}>
+                    <a onClick={() => handleSubjectChange(meeting)}>
+                      {meeting.subject}
+                    </a>
+                  </li>
+                ))}
+            </ul>
+          </div>
+        )}
+      </div>
+
       {/* Status Dropdown */}
       <div className="relative">
         <button
@@ -42,6 +125,7 @@ export default function TaskFilter({ filter, setFilter, assignees }) {
           onClick={() => {
             setOpenStatus(!openStatus);
             setOpenAssignee(false);
+            setOpenSubject(false);
           }}
         >
           {filter.status || "Select Status"}
@@ -81,6 +165,7 @@ export default function TaskFilter({ filter, setFilter, assignees }) {
           onClick={() => {
             setOpenAssignee(!openAssignee);
             setOpenStatus(false);
+            setOpenSubject(false);
           }}
         >
           {filter.assignee || "Select Assignee"}

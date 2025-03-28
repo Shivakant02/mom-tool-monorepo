@@ -1,18 +1,22 @@
 import axios from "axios";
 
-// Function to fetch upcoming events
+// Function to fetch upcoming events in IST
 const fetchUpcomingEvents = async (accessToken) => {
-  // Get the current date in ISO format
-  const currentDate = new Date().toISOString();
+  // Get the current date in IST (Indian Standard Time, UTC+5:30)
+  const currentDate = new Date();
+  const istOffset = 5.5 * 60 * 60 * 1000; // Convert hours to milliseconds
+  const istDate = new Date(currentDate.getTime() + istOffset);
+  const istDateString = istDate.toISOString(); // Convert to ISO format
 
-  // Graph API URL to fetch events that start from the current date onward
-  const graphApiUrl = `${process.env.GRAPH_API_URL}/v1.0/me/events?$filter=start/dateTime ge '${currentDate}'&$orderby=start/dateTime asc`;
+  // Microsoft Graph API URL
+  const graphApiUrl = `${process.env.GRAPH_API_URL}/v1.0/me/events?$filter=start/dateTime ge '${istDateString}'&$orderby=start/dateTime asc`;
 
   try {
     // Make the request to Microsoft Graph API
     const response = await axios.get(graphApiUrl, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
+        Prefer: 'outlook.timezone="Asia/Kolkata"', // Force response in IST
       },
     });
 

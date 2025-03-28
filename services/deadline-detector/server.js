@@ -11,6 +11,7 @@ import emailAutomationRoute from "./email-automation/email-automation-route.js";
 import meetingRoute from "./n8n-config/meeting-routes.js";
 import momRoutes from "./mom-data/mom-routes.js";
 import geminiRoutes from "./gemini/gemini-routes.js";
+import taskByMeetingRoute from "./mom-data/task-by-meeting-id.js";
 import cors from "cors";
 import connectToDatabase from "./config/dbConfig.js";
 
@@ -34,6 +35,7 @@ app.use("/api/v1", updateRoute);
 app.use("/api/v1", emailAutomationRoute);
 app.use("/api/v1/meetings", meetingRoute);
 app.use("/api/v1", momRoutes);
+app.use("/api/v1", taskByMeetingRoute);
 app.use("/api/v1/gemini", geminiRoutes);
 
 const PORT = process.env.PORT || 3005;
