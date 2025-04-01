@@ -82,3 +82,28 @@ export const notifyAssigneeMissingFields = async ({
     throw error;
   }
 };
+
+// send mail to assignee when task is assigned and no missing fields
+export const notifyAssigneeTaskAssigned = async ({ to, taskId }) => {
+  const msg = {
+    to,
+    from: process.env.SENDGRID_FROM_EMAIL,
+    subject: `📝 Task Assignment Notice - Task ID ${taskId}`,
+    text: `You have been assigned Task ID ${taskId}. Please review the task.`,
+    html: `
+      <h2>📝 Task Assignment Alert</h2>
+      <p>Hello,</p>
+      <p>You have been assigned <strong>Task ID: ${taskId}</strong>. Please review the task at your earliest convenience.</p>
+      <br>
+      <p>Regards,<br>Automation Bot 🤖</p>
+    `,
+  };
+
+  try {
+    await sgMail.send(msg);
+    console.log(`✅ Notification email sent to ${to}`);
+  } catch (error) {
+    console.error("❌ SendGrid Error:", error.response?.body || error.message);
+    throw error;
+  }
+};

@@ -103,9 +103,14 @@ export default function MomPage() {
       meeting_id: selectedMeeting.meeting_id,
       attendees: selectedMeeting.attendees,
     };
-    const createTasksRequestBody = transformActionItems(
+    const momActionItems = transformActionItems(
       updatedMomData.mom_data.action_items
     );
+
+    const createTasksRequestBody = {
+      meeting_id: selectedMeeting.meeting_id,
+      tasks: momActionItems,
+    };
 
     console.log("Send MOM Payload:", sendMomRequestBody);
     console.log("Create Tasks Payload:", createTasksRequestBody);

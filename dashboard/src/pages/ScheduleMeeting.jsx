@@ -27,7 +27,9 @@ export default function ScheduleMeetingForm() {
 
   const addAttendee = () => {
     if (attendeeEmail) {
-      if (formData.attendees.some((a) => a.emailAddress === attendeeEmail)) {
+      if (
+        formData.attendees.some((a) => a.emailAddress.address === attendeeEmail)
+      ) {
         alert("Attendee already added!");
         return;
       }
@@ -36,7 +38,13 @@ export default function ScheduleMeetingForm() {
         ...formData,
         attendees: [
           ...formData.attendees,
-          { emailAddress: attendeeEmail, type: "required" },
+          {
+            emailAddress: {
+              address: attendeeEmail,
+              name: attendeeEmail.split("@")[0], // Extracts name from email
+            },
+            type: "required",
+          },
         ],
       });
 
@@ -141,7 +149,9 @@ export default function ScheduleMeetingForm() {
                 key={index}
                 className="flex items-center justify-between p-2 bg-gray-100 rounded-md"
               >
-                <span className="text-gray-800">{attendee.emailAddress}</span>
+                <span className="text-gray-800">
+                  {attendee.emailAddress.address}
+                </span>
                 <button
                   type="button"
                   onClick={() => removeAttendee(index)}

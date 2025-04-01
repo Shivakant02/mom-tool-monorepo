@@ -6,6 +6,7 @@
 
 import {
   notifyAssigneeMissingFields,
+  notifyAssigneeTaskAssigned,
   sendDeadlineEmail,
 } from "../email service/sendgrid-service.js";
 
@@ -91,6 +92,14 @@ export const detectMissingFields = async (tasks) => {
         missingFields.push(field);
       }
     });
+
+    //send mail to assignee if no missing fields
+    if (missingFields.length === 0 && task.email) {
+      await notifyAssigneeTaskAssigned({
+        to: task.email,
+        taskId: task.task_id,
+      });
+    }
 
     if (missingFields.length > 0) {
       results.push({

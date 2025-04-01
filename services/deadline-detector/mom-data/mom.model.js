@@ -9,7 +9,7 @@ const actionItemSchema = new mongoose.Schema({
 
 const momSchema = new mongoose.Schema({
   meeting_id: { type: String, required: true, unique: true },
-  event_id: { type: String, required: false, unique: true },
+  event_id: { type: String, required: false, unique: false },
   subject: { type: String, required: true },
   mom_data: {
     organizer: { type: String, required: true },
